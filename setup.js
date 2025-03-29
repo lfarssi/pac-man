@@ -1,22 +1,22 @@
 export const grid_size=20
 export const cell_size=20
-export const direction= {
-    arrowLeft:{
+export const DIRECTIONS= {
+    ArrowLeft:{
         code :37,
         movement:-1,
         rotation:180
     },
-    arrowUp:{
+    ArrowUp:{
         code :38,
         movement:-grid_size,
         rotation:270
     },
-    arrowRight:{
+    ArrowRight:{
         code :39,
         movement:1,
         rotation:0
     },
-    arrowDown:{
+    ArrowDown:{
         code :40,
         movement:grid_size,
         rotation:90
