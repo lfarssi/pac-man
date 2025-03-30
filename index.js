@@ -9,19 +9,22 @@ const soundDot = './sounds/munch.wav'
 const soundPill = './sounds/pill.wav'
 const soundGameStart = './sounds/game_start.wav'
 const soundGameOver = './sounds/death.wav'
-const soundGhost = './sounds/eat_ghost.wav'
+const soundGhost = 'padding./sounds/eat_ghost.wav'
 
 const gameGrid = document.querySelector('#game')
 const scoreTab = document.querySelector('#score')
 const startBtn = document.querySelector('#start-game')
 const pauseBtn = document.querySelector('#pause-game')
 const restartBtn = document.querySelector('#restart-game')
+const livesDisplay = document.querySelector('#lives');
+
 
 const power_pill_timer= 10000
 const speed= 80
 const gameBoard= GameBoard.createGameBoard(gameGrid, LEVEL)
 
 let score=0
+let lives=3
 let timer= null
 let isWinner = false
 let powerPillActive= false
@@ -35,13 +38,46 @@ function playAudio(audio){
     soundEffect.play()
 }
 
+function handleKeyDown(e) {
+    pacman.handleKeyInput(e, gameBoard.objectExists);
+}
+
 function gameOver(pacman, grid){
     playAudio(soundGameOver)
-    document.removeEventListener('keydown',e=>pacman.handleKeyInput(e,gameBoard.objectExists))
+    document.removeEventListener('keydown',handleKeyDown)
     gameBoard.showGameStatus(isWinner)
     clearInterval(timer)
     startBtn.classList.remove('hide')
     pauseBtn.classList.remove('show')
+}
+function getKilled(){
+    gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+    gameBoard.rotatePacMan(pacman.pos, 0);
+    
+    pacman = new Pacman(2, 287);
+    gameBoard.addObject(287, [object_type.PACMAN]);
+    
+    document.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    
+    ghosts.forEach(ghost => {
+      gameBoard.removeObject(ghost.pos, [
+        object_type.GHOST,
+        object_type.SCARED,
+        ghost.name
+      ]);
+    });
+    
+    ghosts = [
+      new Ghost(5, 188, randomMovement, object_type.BLINKY),
+      new Ghost(4, 209, randomMovement, object_type.PINKY),
+      new Ghost(3, 230, randomMovement, object_type.INKY),
+      new Ghost(2, 251, randomMovement, object_type.CLYDE)
+    ];
+    
+    setTimeout(() => {
+      timer = setInterval(() => gameLoop(pacman, ghosts), speed);
+    }, 1000);
 }
 function checkCollision(pacman, ghosts){
     const collidedGhost=ghosts.find(ghost=>pacman.pos===ghost.pos)
@@ -55,14 +91,23 @@ function checkCollision(pacman, ghosts){
             ])
             collidedGhost.pos=collidedGhost.startPos
             score+=100
-        }else{
+        }else {
+            if(lives<=0){
             gameBoard.removeObject(pacman.pos,[object_type.PACMAN])
             gameBoard.rotatePacMan(pacman.pos,0)
             gameOver(pacman,gameGrid)
+            } else{
+                lives--
+
+                clearInterval(timer);
+                getKilled();
+            }
         }
-    }
+            }
 }
 function gameLoop(pacman, ghosts){
+    livesDisplay.innerHTML = lives;
+
     gameBoard.moveCharacter(pacman)
     checkCollision(pacman,ghosts)
 
@@ -107,14 +152,13 @@ function startGame(){
     isWinner=false
     powerPillActive=false
     score=0
+    lives=3
     startBtn.classList.add('hide')
     gameBoard.createGrid(LEVEL)
     pauseBtn.classList.add('show')
     pacman= new Pacman(2,287)
     gameBoard.addObject(287,[object_type.PACMAN])
-    document.addEventListener('keydown',(e)=>{
-        pacman.handleKeyInput(e,gameBoard.objectExists)
-    })
+    document.addEventListener('keydown',handleKeyDown)
 
      ghosts=[
         new Ghost(5, 188, randomMovement, object_type.BLINKY),
@@ -148,7 +192,7 @@ function restartGame() {
       powerPillTimer = null;
     }
     
-    document.removeEventListener('keydown', e => pacman.handleKeyInput(e, gameBoard.objectExists));
+    document.removeEventListener('keydown',handleKeyDown);
     
     isWinner = false;
     powerPillActive = false;
