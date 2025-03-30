@@ -5,6 +5,12 @@ import GameBoard from './gameBoard.js';
 import Pacman from './Pacman.js';
 import Ghost from './Ghost.js';
 
+const soundDot = './sounds/munch.wav'
+const soundPill = './sounds/pill.wav'
+const soundGameStart = './sounds/game_start.wav'
+const soundGameOver = './sounds/death.wav'
+const soundGhost = './sounds/eat_ghost.wav'
+
 const gameGrid = document.querySelector('#game')
 const scoreTab = document.querySelector('#score')
 const startBtn = document.querySelector('#start-game')
@@ -19,8 +25,13 @@ let isWinner = false
 let powerPillActive= false
 let powerPillTimer= null
 
+function playAudio(audio){
+    const soundEffect=new Audio(audio)
+    soundEffect.play()
+}
 
 function gameOver(pacman, grid){
+    playAudio(soundGameOver)
     document.removeEventListener('keydown',e=>pacman.handleKeyInput(e,gameBoard.objectExists))
     gameBoard.showGameStatus(isWinner)
     clearInterval(timer)
@@ -30,6 +41,7 @@ function checkCollision(pacman, ghosts){
     const collidedGhost=ghosts.find(ghost=>pacman.pos===ghost.pos)
     if (collidedGhost){
         if(pacman.powerPill){
+            playAudio(soundGhost)
             gameBoard.removeObject(collidedGhost.pos, [
                 object_type.GHOST,
                 object_type.SCARED,
@@ -53,12 +65,14 @@ function gameLoop(pacman, ghosts){
 
 
     if(gameBoard.objectExists(pacman.pos, object_type.DOT)){
+        playAudio(soundDot)
         gameBoard.removeObject(pacman.pos, [object_type.DOT])
         gameBoard.dotCount--
         score+=10
     }
 
     if(gameBoard.objectExists(pacman.pos, object_type.PILL)){
+        playAudio(soundPill)
         gameBoard.removeObject(pacman.pos, [object_type.PILL])
 
         pacman.powerPill=true
@@ -77,8 +91,11 @@ function gameLoop(pacman, ghosts){
         isWinner=true
         gameOver(pacman,ghosts)
     }
+
+    scoreTab.innerHTML=score
 }
 function startGame(){
+    playAudio(soundGameStart)
     isWinner=false
     powerPillActive=false
     score=0
