@@ -14,6 +14,7 @@ const soundGhost = './sounds/eat_ghost.wav'
 const gameGrid = document.querySelector('#game')
 const scoreTab = document.querySelector('#score')
 const startBtn = document.querySelector('#start-game')
+const pauseBtn = document.querySelector('#pause-game')
 
 const power_pill_timer= 10000
 const speed= 80
@@ -24,6 +25,9 @@ let timer= null
 let isWinner = false
 let powerPillActive= false
 let powerPillTimer= null
+
+let pacman;
+let ghosts;
 
 function playAudio(audio){
     const soundEffect=new Audio(audio)
@@ -94,6 +98,8 @@ function gameLoop(pacman, ghosts){
 
     scoreTab.innerHTML=score
 }
+
+
 function startGame(){
     playAudio(soundGameStart)
     isWinner=false
@@ -101,13 +107,14 @@ function startGame(){
     score=0
     startBtn.classList.add('hide')
     gameBoard.createGrid(LEVEL)
-    const pacman= new Pacman(2,287)
+    pauseBtn.classList.add('show')
+    pacman= new Pacman(2,287)
     gameBoard.addObject(287,[object_type.PACMAN])
     document.addEventListener('keydown',(e)=>{
         pacman.handleKeyInput(e,gameBoard.objectExists)
     })
 
-    const ghosts=[
+     ghosts=[
         new Ghost(5, 188, randomMovement, object_type.BLINKY),
         new Ghost(4, 209, randomMovement, object_type.PINKY),
         new Ghost(3, 230, randomMovement, object_type.INKY),
@@ -116,4 +123,16 @@ function startGame(){
 
     timer=setInterval(()=>gameLoop(pacman,ghosts),speed)
 }
+function pauseGame(){
+    if(timer){
+        clearInterval(timer)
+        timer = null
+        pauseBtn.textContent = "Resume"
+    } else {
+        timer = setInterval(() => gameLoop(pacman, ghosts), speed)
+        pauseBtn.textContent = "Pause"
+    }
+}
+
 startBtn.addEventListener('click', startGame)
+pauseBtn.addEventListener('click', pauseGame)
