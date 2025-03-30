@@ -67,6 +67,16 @@ function gameLoop(pacman, ghosts){
         clearTimeout(powerPillTimer)
         powerPillTimer=setTimeout(()=>pacman.powerPill=false,power_pill_timer)
     }
+
+    if(pacman.powerPill !== powerPillActive){
+        powerPillActive=pacman.powerPill
+        ghosts.forEach(ghost=>ghost.isScared=pacman.powerPill)
+    }
+
+    if (gameBoard.dotCount==0){
+        isWinner=true
+        gameOver(pacman,ghosts)
+    }
 }
 function startGame(){
     isWinner=false
