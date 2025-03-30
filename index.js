@@ -52,7 +52,11 @@ function gameLoop(pacman, ghosts){
     checkCollision(pacman,ghosts)
 
 
-    
+    if(gameBoard.objectExists(pacman.pos, object_type.DOT)){
+        gameBoard.removeObject(pacman.pos, [object_type.DOT])
+        gameBoard.dotCount--
+        score+=10
+    }
 }
 function startGame(){
     isWinner=false
