@@ -15,6 +15,7 @@ const gameGrid = document.querySelector('#game')
 const scoreTab = document.querySelector('#score')
 const startBtn = document.querySelector('#start-game')
 const pauseBtn = document.querySelector('#pause-game')
+const restartBtn = document.querySelector('#restart-game')
 
 const power_pill_timer= 10000
 const speed= 80
@@ -128,12 +129,51 @@ function pauseGame(){
     if(timer){
         clearInterval(timer)
         timer = null
+        restartBtn.classList.add('show')
         pauseBtn.textContent = "Resume"
     } else {
         timer = setInterval(() => gameLoop(pacman, ghosts), speed)
         pauseBtn.textContent = "Pause"
     }
 }
+function restartGame() {
+        if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+    
+    if (powerPillTimer) {
+      clearTimeout(powerPillTimer);
+      powerPillTimer = null;
+    }
+    
+    document.removeEventListener('keydown', e => pacman.handleKeyInput(e, gameBoard.objectExists));
+    
+    isWinner = false;
+    powerPillActive = false;
+    score = 0;
+    
+    if (pacman) {
+      gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+    }
+    
+    if (ghosts) {
+      ghosts.forEach(ghost => {
+        gameBoard.removeObject(ghost.pos, [
+          object_type.GHOST, 
+          object_type.SCARED, 
+          ghost.name
+        ]);
+      });
+    }
+    
+    scoreTab.innerHTML = score;
+    pauseBtn.textContent = "Pause";
+    
+
+    startGame();
+  }
 
 startBtn.addEventListener('click', startGame)
 pauseBtn.addEventListener('click', pauseGame)
+restartBtn.addEventListener('click', restartGame)
