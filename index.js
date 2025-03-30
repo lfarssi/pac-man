@@ -9,7 +9,7 @@ const gameGrid = document.querySelector('#game')
 const scoreTab = document.querySelector('#score')
 const startBtn = document.querySelector('#start-game')
 
-const power= 10000
+const power_pill_timer= 10000
 const speed= 80
 const gameBoard= GameBoard.createGameBoard(gameGrid, LEVEL)
 
@@ -29,7 +29,7 @@ function gameOver(pacman, grid){
 function checkCollision(pacman, ghosts){
     const collidedGhost=ghosts.find(ghost=>pacman.pos===ghost.pos)
     if (collidedGhost){
-        if(pacman.powerPillActive){
+        if(pacman.powerPill){
             gameBoard.removeObject(collidedGhost.pos, [
                 object_type.GHOST,
                 object_type.SCARED,
@@ -56,6 +56,16 @@ function gameLoop(pacman, ghosts){
         gameBoard.removeObject(pacman.pos, [object_type.DOT])
         gameBoard.dotCount--
         score+=10
+    }
+
+    if(gameBoard.objectExists(pacman.pos, object_type.PILL)){
+        gameBoard.removeObject(pacman.pos, [object_type.PILL])
+
+        pacman.powerPill=true
+        score+=50
+
+        clearTimeout(powerPillTimer)
+        powerPillTimer=setTimeout(()=>pacman.powerPill=false,power_pill_timer)
     }
 }
 function startGame(){
