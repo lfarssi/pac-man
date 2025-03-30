@@ -1,6 +1,10 @@
 import {LEVEL, object_type} from './setup.js';
+import { randomMovement } from './ghostMoves.js';
+
 import GameBoard from './gameBoard.js';
 import Pacman from './Pacman.js';
+import Ghost from './Ghost.js';
+
 const gameGrid = document.querySelector('#game')
 const scoreTab = document.querySelector('#score')
 const startBtn = document.querySelector('#start-game')
@@ -24,6 +28,8 @@ function checkCollision(pacman, ghosts){
 }
 function gameLoop(pacman, ghosts){
     gameBoard.moveCharacter(pacman)
+
+    ghosts.forEach(ghost=>gameBoard.moveCharacter(ghost))
 }
 function startGame(){
     isWinner=false
@@ -36,6 +42,14 @@ function startGame(){
     document.addEventListener('keydown',(e)=>{
         pacman.handleKeyInput(e,gameBoard.objectExists)
     })
-    timer=setInterval(()=>gameLoop(pacman),speed)
+
+    const ghosts=[
+        new Ghost(5, 188, randomMovement, object_type.BLINKY),
+        new Ghost(4, 209, randomMovement, object_type.PINKY),
+        new Ghost(3, 230, randomMovement, object_type.INKY),
+        new Ghost(2, 251, randomMovement, object_type.CLYDE)
+    ]
+
+    timer=setInterval(()=>gameLoop(pacman,ghosts),speed)
 }
 startBtn.addEventListener('click', startGame)
