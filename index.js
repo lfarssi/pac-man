@@ -40,6 +40,7 @@ function gameOver(pacman, grid){
     gameBoard.showGameStatus(isWinner)
     clearInterval(timer)
     startBtn.classList.remove('hide')
+    pauseBtn.classList.remove('show')
 }
 function checkCollision(pacman, ghosts){
     const collidedGhost=ghosts.find(ghost=>pacman.pos===ghost.pos)
