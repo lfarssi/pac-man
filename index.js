@@ -134,6 +134,7 @@ function pauseGame(){
     } else {
         timer = setInterval(() => gameLoop(pacman, ghosts), speed)
         pauseBtn.textContent = "Pause"
+        restartBtn.classList.remove('show')
     }
 }
 function restartGame() {
@@ -170,6 +171,9 @@ function restartGame() {
     scoreTab.innerHTML = score;
     pauseBtn.textContent = "Pause";
     
+    startBtn.classList.remove('hide');
+    pauseBtn.classList.remove('show');
+    restartBtn.classList.remove('show');
 
     startGame();
   }

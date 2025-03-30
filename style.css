@@ -159,6 +159,21 @@
     animation: chew 0.2s linear forwards infinite;
   }
   
+  button {
+    background-color: #FFD700; 
+    color: #333; 
+    border: none;
+    padding: 10px 20px;
+    margin: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #FFC107;
+  }
+  
   @keyframes chew {
     50% {
       clip-path: polygon(
