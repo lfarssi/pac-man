@@ -17,6 +17,7 @@ const startBtn = document.querySelector('#start-game');
 const pauseBtn = document.querySelector('#pause-game');
 const restartBtn = document.querySelector('#restart-game');
 const livesDisplay = document.querySelector('#lives');
+const clockDisplay = document.querySelector('#clock');
 
 const power_pill_timer = 10000;
 const speed = 80;
@@ -24,7 +25,9 @@ const gameBoard = GameBoard.createGameBoard(gameGrid, LEVEL);
 
 let score = 0;
 let lives = 3;
+let clock = 900000; // 15 minutes in ms
 let timer = null;
+let clockTimer = null;
 let isWinner = false;
 let powerPillActive = false;
 let powerPillTimer = null;
@@ -49,11 +52,13 @@ function gameOver(pacman, grid) {
     document.removeEventListener('keydown', handleKeyDown);
     gameBoard.showGameStatus(isWinner);
     clearInterval(timer);
+    clearInterval(clockTimer);
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
 }
 
 function getKilled() {
+    clearInterval(timer);
     gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
     gameBoard.rotatePacMan(pacman.pos, 0);
     
@@ -100,7 +105,7 @@ function checkCollision(pacman, ghosts) {
             score += 100;
         } else {
             lives--;
-            if (lives <= 0) {
+            if (lives <= 0 ) {
                 gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
                 gameBoard.rotatePacMan(pacman.pos, 0);
                 gameOver(pacman, gameGrid);
@@ -109,6 +114,10 @@ function checkCollision(pacman, ghosts) {
                 getKilled();
             }
         }
+    } else if (clock <= 0) {
+        gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+        gameBoard.rotatePacMan(pacman.pos, 0);
+        gameOver(pacman, gameGrid);
     }
 }
 
@@ -116,6 +125,7 @@ function gameLoop(pacman, ghosts) {
     collision = false;
 
     livesDisplay.innerHTML = lives;
+    // The clock display will be updated by the clock timer separately.
 
     gameBoard.moveCharacter(pacman);
     checkCollision(pacman, ghosts);
@@ -148,10 +158,27 @@ function gameLoop(pacman, ghosts) {
 
     if (gameBoard.dotCount == 0) {
         isWinner = true;
-        gameOver(pacman, ghosts);
+        gameOver(pacman, gameGrid);
     }
 
     scoreTab.innerHTML = score;
+}
+
+function startClock() {
+    // Reset clock to 15 minutes
+    clock = 900000;
+    clockDisplay.innerHTML = (clock / 60000).toFixed(0);
+    // Update clock every second
+    clockTimer = setInterval(() => {
+        clock -= 1000;
+        clockDisplay.innerHTML = (clock / 60000).toFixed(0);
+        if (clock <= 0) {
+            clock = 0;
+            clearInterval(clockTimer);
+            // Trigger game over when time runs out
+            gameOver(pacman, gameGrid);
+        }
+    }, 1000);
 }
 
 function startGame() {
@@ -174,6 +201,7 @@ function startGame() {
         new Ghost(2, 251, randomMovement, object_type.CLYDE)
     ];
 
+    startClock();
     timer = setInterval(() => gameLoop(pacman, ghosts), speed);
 }
 
@@ -181,10 +209,12 @@ function pauseGame() {
     if (timer) {
         clearInterval(timer);
         timer = null;
+        clearInterval(clockTimer);
         restartBtn.classList.add('show');
         pauseBtn.textContent = "Resume";
     } else {
         timer = setInterval(() => gameLoop(pacman, ghosts), speed);
+        startClock(); // Restart clock timer
         pauseBtn.textContent = "Pause";
         restartBtn.classList.remove('show');
     }
@@ -195,22 +225,27 @@ function restartGame() {
         clearInterval(timer);
         timer = null;
     }
-
+    
+    if (clockTimer) {
+        clearInterval(clockTimer);
+        clockTimer = null;
+    }
+    
     if (powerPillTimer) {
         clearTimeout(powerPillTimer);
         powerPillTimer = null;
     }
-
+    
     document.removeEventListener('keydown', handleKeyDown);
-
+    
     isWinner = false;
     powerPillActive = false;
     score = 0;
-
+    
     if (pacman) {
         gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
     }
-
+    
     if (ghosts) {
         ghosts.forEach(ghost => {
             gameBoard.removeObject(ghost.pos, [
@@ -220,14 +255,14 @@ function restartGame() {
             ]);
         });
     }
-
+    
     scoreTab.innerHTML = score;
     pauseBtn.textContent = "Pause";
-
+    
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
     restartBtn.classList.remove('show');
-
+    
     startGame();
 }
 
