@@ -1,4 +1,4 @@
-import { LEVEL, object_type } from './setup.js';
+import { LEVEL,LEVEL2, LEVEL3, object_type } from './setup.js';
 import { randomMovement } from './ghostMoves.js';
 
 import GameBoard from './gameBoard.js';
@@ -18,6 +18,7 @@ const pauseBtn = document.querySelector('#pause-game');
 const restartBtn = document.querySelector('#restart-game');
 const livesDisplay = document.querySelector('#lives');
 const clockDisplay = document.querySelector('#clock');
+const level = document.querySelector('#level');
 
 const power_pill_timer = 10000;
 const speed = 80;
@@ -25,6 +26,7 @@ const gameBoard = GameBoard.createGameBoard(gameGrid, LEVEL);
 
 let score = 0;
 let lives = 3;
+let winTime=0;
 let clock = 900000; // 15 minutes in ms
 let timer = null;
 let clockTimer = null;
@@ -125,7 +127,7 @@ function gameLoop(pacman, ghosts) {
     collision = false;
 
     livesDisplay.innerHTML = lives;
-    // The clock display will be updated by the clock timer separately.
+    level.innerHTML = winTime+1;
 
     gameBoard.moveCharacter(pacman);
     checkCollision(pacman, ghosts);
@@ -157,6 +159,9 @@ function gameLoop(pacman, ghosts) {
     }
 
     if (gameBoard.dotCount == 0) {
+        winTime++
+       startGame()
+    } else if(winTime==3){
         isWinner = true;
         gameOver(pacman, gameGrid);
     }
@@ -165,17 +170,14 @@ function gameLoop(pacman, ghosts) {
 }
 
 function startClock() {
-    // Reset clock to 15 minutes
     clock = 900000;
     clockDisplay.innerHTML = (clock / 60000).toFixed(0);
-    // Update clock every second
     clockTimer = setInterval(() => {
         clock -= 1000;
         clockDisplay.innerHTML = (clock / 60000).toFixed(0);
         if (clock <= 0) {
             clock = 0;
             clearInterval(clockTimer);
-            // Trigger game over when time runs out
             gameOver(pacman, gameGrid);
         }
     }, 1000);
@@ -188,7 +190,16 @@ function startGame() {
     score = 0;
     lives = 3;
     startBtn.classList.add('hide');
-    gameBoard.createGrid(LEVEL);
+    if (winTime==0){
+        gameBoard.createGrid(LEVEL);
+
+    } else if (winTime==1){
+        gameBoard.createGrid(LEVEL2);
+
+    }else if (winTime==2){
+        gameBoard.createGrid(LEVEL3);
+
+    }
     pauseBtn.classList.add('show');
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [object_type.PACMAN]);
