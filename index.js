@@ -208,19 +208,37 @@ function startGameLoop() {
     animationId = requestAnimationFrame(gameAnimationLoop);
 }
 function startClock() {
-    clock = 900000;
-    clockDisplay.innerHTML = (clock / 60000).toFixed(0);
+    clock = 900000; // 15 minutes in milliseconds
+    
+    // Format time as MM:SS
+    const formatTime = (milliseconds) => {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        
+        // Add leading zeros if needed
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        const formattedSeconds = seconds.toString().padStart(2, '0');
+        
+        return `${formattedMinutes}:${formattedSeconds}`;
+    };
+    
+    // Initial display
+    clockDisplay.innerHTML = formatTime(clock);
+    
+    // Update clock every second
     clockTimer = setInterval(() => {
         clock -= 1000;
-        clockDisplay.innerHTML = (clock / 60000).toFixed(0);
+        
         if (clock <= 0) {
             clock = 0;
             clearInterval(clockTimer);
             gameOver();
         }
+        
+        clockDisplay.innerHTML = formatTime(clock);
     }, 1000);
 }
-
 function startGame() {
     playAudio(soundGameStart);
     isWinner = false;
