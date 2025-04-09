@@ -1,4 +1,4 @@
-import { DIRECTIONS, object_type } from "./setup.js";
+import { DIRECTIONS, OBJECT_TYPE } from "./setup.js";
 
 class Ghost{
     constructor(speed=5,startPos,movement, name){
@@ -29,9 +29,9 @@ class Ghost{
         return {nextMovePos, direction}
     }
     makeMove(){
-        const classesToRemove=[object_type.GHOST,object_type.SCARED, this.name]
-        let classesToAdd=[object_type.GHOST, this.name]
-        if(this.isScared)classesToAdd=[...classesToAdd, object_type.SCARED]
+        const classesToRemove=[OBJECT_TYPE.GHOST,OBJECT_TYPE.SCARED, this.name]
+        let classesToAdd=[OBJECT_TYPE.GHOST, this.name]
+        if(this.isScared)classesToAdd=[...classesToAdd, OBJECT_TYPE.SCARED]
         return {classesToRemove, classesToAdd}
     }
     setNewPos(nextMovePos, direction){
