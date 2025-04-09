@@ -28,6 +28,8 @@ class Pacman {
       objectExist(nextMovePos, OBJECT_TYPE.GHOSTLAIR)
     ) {
       nextMovePos = this.pos;
+     
+
     }
 
     return { nextMovePos, direction: this.dir };

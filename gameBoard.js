@@ -17,9 +17,11 @@ class GameBoard {
         this.grid=[]
         this.DOMGrid.innerHTML=''
         this.DOMGrid.style.cssText=`grid-template-columns:repeat(${grid_size}, ${cell_size}px)`
-        level.forEach((square, i)=>{
+        level.forEach((square)=>{
             const  div= document.createElement('div')
             div.classList.add('square',class_list[square])
+            console.log(class_list[square]);
+            
             div.style.cssText=`width: ${cell_size}px; height:${cell_size}px;`
             this.DOMGrid.appendChild(div)
             this.grid.push(div)
@@ -41,7 +43,7 @@ class GameBoard {
     }
     moveCharacter(character){
         if(character.shouldMove()){
-            const {nextMovePos, direction}=character.getNextMove(this.objectExists)
+            const {nextMovePos, direction}=character.getNextMove(this.objectExists.bind(this))
             const {classesToRemove, classesToAdd}=character.makeMove()
             if(character.rotation&& nextMovePos!==character.pos){
                 this.rotatePacMan(nextMovePos,character.dir.rotation)
