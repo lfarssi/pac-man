@@ -15,7 +15,9 @@ const gameGrid = document.querySelector('#game');
 const scoreTab = document.querySelector('#score');
 const startBtn = document.querySelector('#start-game');
 const pauseBtn = document.querySelector('#pause-game');
+const resumeBtn = document.querySelector('#resume-game');
 const restartBtn = document.querySelector('#restart-game');
+const menubar = document.querySelector('#menu');
 const livesDisplay = document.querySelector('#lives');
 const clockDisplay = document.querySelector('#clock');
 const level = document.querySelector('#level');
@@ -55,6 +57,9 @@ function gameOver() {
     playAudio(soundGameOver);
     livesDisplay.innerHTML = lives;
     document.removeEventListener('keydown', handleKeyDown);
+    if (isWinner){
+        startBtn.innerHTML="Play Again"
+    }
     gameBoard.showGameStatus(isWinner);
     
     if (animationId) {
@@ -256,14 +261,17 @@ function pauseGame() {
         }
         clearInterval(clockTimer);
         isPaused = true;
-        restartBtn.classList.add('show');
-        pauseBtn.textContent = "Resume";
+        menubar.classList.add('show')
+        pauseBtn.classList.add('hide') 
     } else {
         startGameLoop();
+        menubar.classList.remove('show')
+        pauseBtn.classList.remove('hide') 
+
         startClock(); 
         isPaused = false;
-        pauseBtn.textContent = "Pause";
-        restartBtn.classList.remove('show');
+        
+
     }
 }
 
@@ -317,4 +325,5 @@ function restartGame() {
 
 startBtn.addEventListener('click', startGame);
 pauseBtn.addEventListener('click', pauseGame);
+resumeBtn.addEventListener('click', pauseGame);
 restartBtn.addEventListener('click', restartGame);
