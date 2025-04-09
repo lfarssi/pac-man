@@ -46,10 +46,11 @@ export const class_list=[
     OBJECT_TYPE.CLYDE,
     OBJECT_TYPE.PILL,
     OBJECT_TYPE.PACMAN,
-    OBJECT_TYPE.GHOST,
-    OBJECT_TYPE.SCARED,
     OBJECT_TYPE.GHOSTLAIR,
+
+    
 ]
+
 
 export const LEVEL = [
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
