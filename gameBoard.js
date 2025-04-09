@@ -1,4 +1,4 @@
-import { grid_size, cell_size, object_type, class_list } from "./setup.js";
+import { grid_size, cell_size, OBJECT_TYPE, class_list } from "./setup.js";
 
 class GameBoard {
     constructor(DOMGrid){
@@ -23,7 +23,7 @@ class GameBoard {
             div.style.cssText=`width: ${cell_size}px; height:${cell_size}px;`
             this.DOMGrid.appendChild(div)
             this.grid.push(div)
-            if (class_list[square]==object_type.DOT)this.dotCount++
+            if (class_list[square]==OBJECT_TYPE.DOT)this.dotCount++
         })
        
     }

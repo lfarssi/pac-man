@@ -22,33 +22,33 @@ export const DIRECTIONS= {
         rotation:90
     }
 }
-export const object_type={
-    BLANK:'blank',
+export const OBJECT_TYPE = {
+    BLANK: 'blank',
     WALL: 'wall',
-    DOT: 'dot', 
+    DOT: 'dot',
     BLINKY: 'blinky',
     PINKY: 'pinky',
     INKY: 'inky',
-    CLYDE:'clyde',
-    PILL:'pill',
-    PACMAN:'pacman',
-    GHOST:'ghost',
-    SCARED:'scared',
-    GHOSTLAIR:'lair'
-}
+    CLYDE: 'clyde',
+    PILL: 'pill',
+    PACMAN: 'pacman',
+    GHOST: 'ghost',
+    SCARED: 'scared',
+    GHOSTLAIR: 'lair'
+  };
 export const class_list=[
-    object_type.BLANK,
-    object_type.WALL,
-    object_type.DOT,
-    object_type.PINKY,
-    object_type.INKY,
-    object_type.BLINKY,
-    object_type.CLYDE,
-    object_type.PILL,
-    object_type.PACMAN,
-    object_type.GHOST,
-    object_type.SCARED,
-    object_type.GHOSTLAIR,
+    OBJECT_TYPE.BLANK,
+    OBJECT_TYPE.WALL,
+    OBJECT_TYPE.DOT,
+    OBJECT_TYPE.PINKY,
+    OBJECT_TYPE.INKY,
+    OBJECT_TYPE.BLINKY,
+    OBJECT_TYPE.CLYDE,
+    OBJECT_TYPE.PILL,
+    OBJECT_TYPE.PACMAN,
+    OBJECT_TYPE.GHOST,
+    OBJECT_TYPE.SCARED,
+    OBJECT_TYPE.GHOSTLAIR,
 ]
 
 export const LEVEL = [

@@ -1,4 +1,4 @@
-import { LEVEL,LEVEL2, LEVEL3, object_type } from './setup.js';
+import { LEVEL,LEVEL2, LEVEL3, OBJECT_TYPE } from './setup.js';
 import { randomMovement } from './ghostMoves.js';
 
 import GameBoard from './gameBoard.js';
@@ -33,7 +33,10 @@ let clockTimer = null;
 let isWinner = false;
 let powerPillActive = false;
 let powerPillTimer = null;
-
+let animationId = null;
+let lastTimestamp = 0;
+let isPaused = false;
+let isGameOver = false;
 let pacman;
 let ghosts;
 
@@ -48,46 +51,54 @@ function handleKeyDown(e) {
     pacman.handleKeyInput(e, gameBoard.objectExists);
 }
 
-function gameOver(pacman, grid) {
+function gameOver() {
     playAudio(soundGameOver);
     livesDisplay.innerHTML = lives;
     document.removeEventListener('keydown', handleKeyDown);
     gameBoard.showGameStatus(isWinner);
-    clearInterval(timer);
+    
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
     clearInterval(clockTimer);
+    isGameOver=true
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
 }
 
 function getKilled() {
-    clearInterval(timer);
-    gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+    gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
     gameBoard.rotatePacMan(pacman.pos, 0);
     
     pacman = new Pacman(2, 287);
-    gameBoard.addObject(287, [object_type.PACMAN]);
+    gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
     
     document.removeEventListener('keydown', handleKeyDown);
     document.addEventListener('keydown', handleKeyDown);
     
     ghosts.forEach(ghost => {
       gameBoard.removeObject(ghost.pos, [
-        object_type.GHOST,
-        object_type.SCARED,
+        OBJECT_TYPE.GHOST,
+        OBJECT_TYPE.SCARED,
         ghost.name
       ]);
     });
     
     ghosts = [
-      new Ghost(5, 188, randomMovement, object_type.BLINKY),
-      new Ghost(4, 209, randomMovement, object_type.PINKY),
-      new Ghost(3, 230, randomMovement, object_type.INKY),
-      new Ghost(2, 251, randomMovement, object_type.CLYDE)
+      new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
+      new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
+      new Ghost(3, 230, randomMovement, OBJECT_TYPE.INKY),
+      new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
     ];
     
     setTimeout(() => {
-      timer = setInterval(() => gameLoop(pacman, ghosts), speed);
-    }, 1000);
+        startGameLoop();
+      }, 1000);
 }
 
 function checkCollision(pacman, ghosts) {
@@ -99,8 +110,8 @@ function checkCollision(pacman, ghosts) {
         if (pacman.powerPill) {
             playAudio(soundGhost);
             gameBoard.removeObject(collidedGhost.pos, [
-                object_type.GHOST,
-                object_type.SCARED,
+                OBJECT_TYPE.GHOST,
+                OBJECT_TYPE.SCARED,
                 collidedGhost.name
             ]);
             collidedGhost.pos = collidedGhost.startPos;
@@ -108,18 +119,18 @@ function checkCollision(pacman, ghosts) {
         } else {
             lives--;
             if (lives <= 0 ) {
-                gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+                gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
                 gameBoard.rotatePacMan(pacman.pos, 0);
-                gameOver(pacman, gameGrid);
+                gameOver();
             } else {
                 clearInterval(timer);
                 getKilled();
             }
         }
     } else if (clock <= 0) {
-        gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+        gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
         gameBoard.rotatePacMan(pacman.pos, 0);
-        gameOver(pacman, gameGrid);
+        gameOver();
     }
 }
 
@@ -135,16 +146,16 @@ function gameLoop(pacman, ghosts) {
     ghosts.forEach(ghost => gameBoard.moveCharacter(ghost));
     checkCollision(pacman, ghosts);
 
-    if (gameBoard.objectExists(pacman.pos, object_type.DOT)) {
+    if (gameBoard.objectExists(pacman.pos, OBJECT_TYPE.DOT)) {
         playAudio(soundDot);
-        gameBoard.removeObject(pacman.pos, [object_type.DOT]);
+        gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.DOT]);
         gameBoard.dotCount--;
         score += 10;
     }
 
-    if (gameBoard.objectExists(pacman.pos, object_type.PILL)) {
+    if (gameBoard.objectExists(pacman.pos, OBJECT_TYPE.PILL)) {
         playAudio(soundPill);
-        gameBoard.removeObject(pacman.pos, [object_type.PILL]);
+        gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PILL]);
 
         pacman.powerPill = true;
         score += 50;
@@ -163,12 +174,34 @@ function gameLoop(pacman, ghosts) {
        startGame()
     } else if(winTime==3){
         isWinner = true;
-        gameOver(pacman, gameGrid);
+        gameOver();
     }
 
     scoreTab.innerHTML = score;
 }
+function gameAnimationLoop(timestamp) {
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    
+    const elapsed = timestamp - lastTimestamp;
+    
+    // Only update game if enough time has passed according to desired speed
+    if (elapsed >= speed) {
+        gameLoop(pacman, ghosts);
+        lastTimestamp = timestamp;
+    }
+    
+    // Continue animation loop if game is still running
+    if (!isGameOver && !isPaused) {
+        animationId = requestAnimationFrame(gameAnimationLoop);
+    }
+}
 
+function startGameLoop() {
+    lastTimestamp = 0;
+    isPaused = false;
+    isGameOver = false;
+    animationId = requestAnimationFrame(gameAnimationLoop);
+}
 function startClock() {
     clock = 900000;
     clockDisplay.innerHTML = (clock / 60000).toFixed(0);
@@ -178,7 +211,7 @@ function startClock() {
         if (clock <= 0) {
             clock = 0;
             clearInterval(clockTimer);
-            gameOver(pacman, gameGrid);
+            gameOver();
         }
     }, 1000);
 }
@@ -202,40 +235,44 @@ function startGame() {
     }
     pauseBtn.classList.add('show');
     pacman = new Pacman(2, 287);
-    gameBoard.addObject(287, [object_type.PACMAN]);
+    gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
     document.addEventListener('keydown', handleKeyDown);
 
     ghosts = [
-        new Ghost(5, 188, randomMovement, object_type.BLINKY),
-        new Ghost(4, 209, randomMovement, object_type.PINKY),
-        new Ghost(3, 230, randomMovement, object_type.INKY),
-        new Ghost(2, 251, randomMovement, object_type.CLYDE)
+        new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
+        new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
+        new Ghost(3, 230, randomMovement, OBJECT_TYPE.INKY),
+        new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
     ];
 
     startClock();
-    timer = setInterval(() => gameLoop(pacman, ghosts), speed);
-}
+    startGameLoop();}
 
 function pauseGame() {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
+    if (!isPaused) {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
         clearInterval(clockTimer);
+        isPaused = true;
         restartBtn.classList.add('show');
         pauseBtn.textContent = "Resume";
     } else {
-        timer = setInterval(() => gameLoop(pacman, ghosts), speed);
-        startClock(); // Restart clock timer
+        startGameLoop();
+        startClock(); 
+        isPaused = false;
         pauseBtn.textContent = "Pause";
         restartBtn.classList.remove('show');
     }
 }
 
 function restartGame() {
-    if (timer) {
-        clearInterval(timer);
-        timer = null;
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
     }
+
     
     if (clockTimer) {
         clearInterval(clockTimer);
@@ -252,16 +289,17 @@ function restartGame() {
     isWinner = false;
     powerPillActive = false;
     score = 0;
-    
+    isPaused = false;
+    isGameOver = false;
     if (pacman) {
-        gameBoard.removeObject(pacman.pos, [object_type.PACMAN]);
+        gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
     }
     
     if (ghosts) {
         ghosts.forEach(ghost => {
             gameBoard.removeObject(ghost.pos, [
-                object_type.GHOST, 
-                object_type.SCARED, 
+                OBJECT_TYPE.GHOST, 
+                OBJECT_TYPE.SCARED, 
                 ghost.name
             ]);
         });
