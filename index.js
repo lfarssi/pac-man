@@ -291,6 +291,9 @@ function restartGame() {
         clearTimeout(powerPillTimer);
         powerPillTimer = null;
     }
+    menubar.classList.remove('show')
+    pauseBtn.classList.remove('hide') 
+
     
     document.removeEventListener('keydown', handleKeyDown);
     
