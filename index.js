@@ -343,7 +343,18 @@ function restartGame() {
     
     startGame();
 }
+ document.addEventListener('keydown',(e)=>{
+   console.log(e.keyCode);
+   if(e.keyCode==32){
+    startGame();
+}else if(e.keyCode==27){
+pauseGame();
 
+}else if(e.keyCode==82){
+    restartGame()
+}
+
+})
 startBtn.addEventListener('click', startGame);
 pauseBtn.addEventListener('click', pauseGame);
 resumeBtn.addEventListener('click', pauseGame);
