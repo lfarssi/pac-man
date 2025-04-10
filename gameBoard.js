@@ -45,7 +45,7 @@ class GameBoard {
     }
     moveCharacter(character){
         if(character.shouldMove()){
-            const {nextMovePos, direction}=character.getNextMove(this.objectExists.bind(this))
+            const {nextMovePos, direction}=character.getNextMove(this.objectExists)
             const {classesToRemove, classesToAdd}=character.makeMove()
             if(character.rotation&& nextMovePos!==character.pos){
                 this.rotatePacMan(nextMovePos,character.dir.rotation)
