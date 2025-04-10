@@ -80,7 +80,7 @@ function getKilled() {
     gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
     gameBoard.rotatePacMan(pacman.pos, 0);
     
-        ghosts.forEach(ghost => {
+        ghosts.forEach(ghost => {            
                 gameBoard.removeObject(ghost.pos, [
                     OBJECT_TYPE.GHOST,
                     OBJECT_TYPE.SCARED,
