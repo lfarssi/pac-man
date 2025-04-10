@@ -40,7 +40,7 @@ let lastTimestamp = 0;
 let isPaused = false;
 let isGameOver = false;
 let pacman;
-let ghosts;
+let ghosts=[];
 
 let collision = false;
 
@@ -56,8 +56,10 @@ function handleKeyDown(e) {
 function gameOver() {
     playAudio(soundGameOver);
     livesDisplay.innerHTML = lives;
+    winTime=0
     document.removeEventListener('keydown', handleKeyDown);
     if (isWinner){
+        startBtn.classList.remove('hide')
         startBtn.innerHTML="Play Again"
     }
     gameBoard.showGameStatus(isWinner);
@@ -66,6 +68,7 @@ function gameOver() {
         cancelAnimationFrame(animationId);
         animationId = null;
     }
+
     clearInterval(clockTimer);
     isGameOver=true
     startBtn.classList.remove('hide');
@@ -79,16 +82,15 @@ function getKilled() {
     }
     gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
     gameBoard.rotatePacMan(pacman.pos, 0);
-    
-        ghosts.forEach(ghost => {            
-                gameBoard.removeObject(ghost.pos, [
-                    OBJECT_TYPE.GHOST,
-                    OBJECT_TYPE.SCARED,
-                    ghost.name
-                ]);
-            }
-        );
-    
+
+    ghosts.forEach(ghost => {
+        gameBoard.removeObject(ghost.pos, [
+            OBJECT_TYPE.GHOST,
+            OBJECT_TYPE.SCARED,
+            ghost.name
+        ]);
+        ghost.reset();
+    });
 
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
@@ -96,18 +98,16 @@ function getKilled() {
     document.removeEventListener('keydown', handleKeyDown);
     document.addEventListener('keydown', handleKeyDown);
     
-  
-    
     ghosts = [
-      new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
-      new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
-      new Ghost(3, 230, randomMovement, OBJECT_TYPE.INKY),
-      new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
+        new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
+        new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
+        new Ghost(3, 230, randomMovement, OBJECT_TYPE.INKY),
+        new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
     ];
     
     setTimeout(() => {
         startGameLoop();
-      }, 1000);
+    }, 1000);
 }
 
 function checkCollision(pacman, ghosts) {
@@ -145,7 +145,6 @@ function checkCollision(pacman, ghosts) {
 
 function gameLoop(pacman, ghosts) {
     collision = false;
-
     livesDisplay.innerHTML = lives;
     level.innerHTML = winTime+1;
 
@@ -212,8 +211,9 @@ function startGameLoop() {
     isGameOver = false;
     animationId = requestAnimationFrame(gameAnimationLoop);
 }
-function startClock() {
-    clock = 900000; // 15 minutes in milliseconds
+
+function startClock(initialTime = 900000) {
+    clock = initialTime; // Use provided time or default to 15 minutes
     
     // Format time as MM:SS
     const formatTime = (milliseconds) => {
@@ -244,6 +244,7 @@ function startClock() {
         clockDisplay.innerHTML = formatTime(clock);
     }, 1000);
 }
+
 function startGame() {
     playAudio(soundGameStart);
     isWinner = false;
@@ -274,7 +275,8 @@ function startGame() {
     ];
 
     startClock();
-    startGameLoop();}
+    startGameLoop();
+}
 
 function pauseGame() {
     if (!isPaused) {
@@ -291,10 +293,8 @@ function pauseGame() {
         menubar.classList.remove('show')
         pauseBtn.classList.remove('hide') 
 
-        startClock(); 
+        startClock(clock); 
         isPaused = false;
-        
-
     }
 }
 
@@ -304,7 +304,6 @@ function restartGame() {
         animationId = null;
     }
 
-    
     if (clockTimer) {
         clearInterval(clockTimer);
         clockTimer = null;
@@ -317,7 +316,6 @@ function restartGame() {
     menubar.classList.remove('show')
     pauseBtn.classList.remove('hide') 
 
-    
     document.removeEventListener('keydown', handleKeyDown);
     
     isWinner = false;
@@ -348,7 +346,8 @@ function restartGame() {
     
     startGame();
 }
- document.addEventListener('keydown',(e)=>{
+
+document.addEventListener('keydown',(e)=>{
    console.log(e.keyCode);
    if(e.keyCode==32){
     startGame();
@@ -358,8 +357,8 @@ pauseGame();
 }else if(e.keyCode==82){
     restartGame()
 }
-
 })
+
 startBtn.addEventListener('click', startGame);
 pauseBtn.addEventListener('click', pauseGame);
 resumeBtn.addEventListener('click', pauseGame);
