@@ -349,7 +349,7 @@ function restartGame() {
 
 document.addEventListener('keydown',(e)=>{
    console.log(e.keyCode);
-   if(e.keyCode==32){
+   if(e.keyCode==32 && !isPaused){
     startGame();
 }else if(e.keyCode==27){
 pauseGame();
