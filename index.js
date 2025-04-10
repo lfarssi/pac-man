@@ -23,14 +23,13 @@ const clockDisplay = document.querySelector('#clock');
 const level = document.querySelector('#level');
 
 const power_pill_timer = 10000;
-const speed = 80;
+const speed = 70;
 const gameBoard = GameBoard.createGameBoard(gameGrid, LEVEL);
 
 let score = 0;
 let lives = 3;
 let winTime=0;
-let clock = 900000; // 15 minutes in ms
-let timer = null;
+let clock = 900000; 
 let clockTimer = null;
 let isWinner = false;
 let powerPillActive = false;
@@ -39,6 +38,8 @@ let animationId = null;
 let lastTimestamp = 0;
 let isPaused = false;
 let isGameOver = false;
+let started=false;
+
 let pacman;
 let ghosts=[];
 
@@ -132,7 +133,6 @@ function checkCollision(pacman, ghosts) {
                 gameBoard.rotatePacMan(pacman.pos, 0);
                 gameOver();
             } else {
-                clearInterval(timer);
                 getKilled();
             }
         }
@@ -149,7 +149,7 @@ function gameLoop(pacman, ghosts) {
     level.innerHTML = winTime+1;
 
     gameBoard.moveCharacter(pacman);
-    checkCollision(pacman, ghosts);
+    // checkCollision(pacman, ghosts);
 
     ghosts.forEach(ghost => gameBoard.moveCharacter(ghost));
     checkCollision(pacman, ghosts);
@@ -195,6 +195,7 @@ function gameAnimationLoop(timestamp) {
     
     // Only update game if enough time has passed according to desired speed
     if (elapsed >= speed) {
+        
         gameLoop(pacman, ghosts);
         lastTimestamp = timestamp;
     }
@@ -213,27 +214,24 @@ function startGameLoop() {
 }
 
 function startClock(initialTime = 900000) {
-    clock = initialTime; // Use provided time or default to 15 minutes
+    clock = initialTime; 
     
-    // Format time as MM:SS
+    // Format MM:SS
     const formatTime = (milliseconds) => {
         const totalSeconds = Math.floor(milliseconds / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        
-        // Add leading zeros if needed
+
         const formattedMinutes = minutes.toString().padStart(2, '0');
         const formattedSeconds = seconds.toString().padStart(2, '0');
         
         return `${formattedMinutes}:${formattedSeconds}`;
     };
     
-    // Initial display
     clockDisplay.innerHTML = formatTime(clock);
     
-    // Update clock every second
     clockTimer = setInterval(() => {
-        clock -= 1000;
+        clock -= 10;
         
         if (clock <= 0) {
             clock = 0;
@@ -242,10 +240,11 @@ function startClock(initialTime = 900000) {
         }
         
         clockDisplay.innerHTML = formatTime(clock);
-    }, 1000);
+    }, 10);
 }
 
 function startGame() {
+    started= true
     playAudio(soundGameStart);
     isWinner = false;
     powerPillActive = false;
@@ -338,7 +337,6 @@ function restartGame() {
     }
     
     scoreTab.innerHTML = score;
-    pauseBtn.textContent = "Pause";
     
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
@@ -346,10 +344,9 @@ function restartGame() {
     
     startGame();
 }
-
 document.addEventListener('keydown',(e)=>{
    console.log(e.keyCode);
-   if(e.keyCode==32 && !isPaused){
+   if(e.keyCode==32 && !started && !isPaused){
     startGame();
 }else if(e.keyCode==27){
 pauseGame();
