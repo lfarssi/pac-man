@@ -20,6 +20,12 @@ class Ghost{
         this.timer++
         return false
     }
+    reset() {
+        this.pos = this.startPos;
+        this.dir = DIRECTIONS.ArrowRight;
+        this.isScared = false;
+        this.timer = 0;
+    }
     getNextMove(objectExists){
         const   {nextMovePos, direction}=this.movement(
             this.pos,
