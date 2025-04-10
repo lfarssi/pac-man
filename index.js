@@ -9,7 +9,7 @@ const soundDot = './sounds/munch.wav';
 const soundPill = './sounds/pill.wav';
 const soundGameStart = './sounds/game_start.wav';
 const soundGameOver = './sounds/death.wav';
-const soundGhost = 'padding./sounds/eat_ghost.wav';
+const soundGhost = './sounds/eat_ghost.wav';
 
 const gameGrid = document.querySelector('#game');
 const scoreTab = document.querySelector('#score');
