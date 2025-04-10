@@ -47,8 +47,6 @@ export const class_list=[
     OBJECT_TYPE.PILL,
     OBJECT_TYPE.PACMAN,
     OBJECT_TYPE.GHOSTLAIR,
-
-    
 ]
 
 

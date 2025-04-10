@@ -11,6 +11,8 @@ class Pacman {
   }
 
   shouldMove() {
+    // console.log(this.dir);
+    
     if (!this.dir) return;
 
     if (this.timer === this.speed) {
@@ -22,6 +24,7 @@ class Pacman {
 
   getNextMove(objectExist) {
     let nextMovePos = this.pos + this.dir.movement;
+    // console.log(nextMovePos,this.dir.movement,this.pos);
 
     if (
       objectExist(nextMovePos, OBJECT_TYPE.WALL) ||
@@ -50,6 +53,7 @@ class Pacman {
     let dir;
 
     if (e.keyCode >= 37 && e.keyCode <= 40) {
+      
       dir = DIRECTIONS[e.key];
     } else {
       return;

@@ -80,19 +80,23 @@ function getKilled() {
     gameBoard.removeObject(pacman.pos, [OBJECT_TYPE.PACMAN]);
     gameBoard.rotatePacMan(pacman.pos, 0);
     
+        ghosts.forEach(ghost => {
+                gameBoard.removeObject(ghost.pos, [
+                    OBJECT_TYPE.GHOST,
+                    OBJECT_TYPE.SCARED,
+                    ghost.name
+                ]);
+            }
+        );
+    
+
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
     
     document.removeEventListener('keydown', handleKeyDown);
     document.addEventListener('keydown', handleKeyDown);
     
-    ghosts.forEach(ghost => {
-      gameBoard.removeObject(ghost.pos, [
-        OBJECT_TYPE.GHOST,
-        OBJECT_TYPE.SCARED,
-        ghost.name
-      ]);
-    });
+  
     
     ghosts = [
       new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
@@ -175,13 +179,14 @@ function gameLoop(pacman, ghosts) {
     }
 
     if (gameBoard.dotCount == 0) {
-        winTime++
-       startGame()
-    } else if(winTime==3){
-        isWinner = true;
-        gameOver();
+        winTime++;
+        if (winTime === 3) {
+            isWinner = true;
+            gameOver();
+        } else {
+            startGame();
+        }
     }
-
     scoreTab.innerHTML = score;
 }
 function gameAnimationLoop(timestamp) {
