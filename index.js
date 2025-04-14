@@ -54,6 +54,16 @@ function handleKeyDown(e) {
     pacman.handleKeyInput(e, gameBoard.objectExists);
 }
 
+function showStoryScreen(message) {
+    const screen= document.querySelector('#story-container')
+    const content= document.querySelector('#story-content')
+    content.innerHTML=`${message}`
+    screen.classList.add('show')
+    setTimeout(() => {
+        screen.classList.remove('show');
+    }, 3000);
+    }   
+
 function gameOver() {
     playAudio(soundGameOver);
     livesDisplay.innerHTML = lives;
@@ -252,12 +262,18 @@ function startGame() {
     lives = 3;
     startBtn.classList.add('hide');
     if (winTime==0){
+        showStoryScreen(`<p>In the neon maze of Neon City, darkness has begun to creep in. Once a haven of delicious dots and peaceful passageways, the maze is now besieged by ghostly forces led by the sinister Phantom. Only one hero, Pacman, holds the key to restoring light and harmony.</p>
+            <p>Press any key to begin your epic quest.</p>`)
         gameBoard.createGrid(LEVEL);
 
     } else if (winTime==1){
+        showStoryScreen( `<p>After facing countless ghostly minions, a mysterious message reveals Phantom's hidden strength. Prepare for the ultimate challenge ahead.</p>
+            <p>Press any key to continue...</p>`)
         gameBoard.createGrid(LEVEL2);
 
     }else if (winTime==2){
+        showStoryScreen( `<p>In the final showdown, Pacman confronts Phantom in the maze’s darkest depths. With courage and newfound power, he defeats the darkness, restoring peace to Neon City!</p>
+            <p>Press any key to continue...</p>`)
         gameBoard.createGrid(LEVEL3);
 
     }
