@@ -45,6 +45,7 @@ let ghosts=[];
 
 let collision = false;
 
+
 function playAudio(audio) {
     const soundEffect = new Audio(audio);
     soundEffect.play();
@@ -111,7 +112,7 @@ function getKilled() {
 
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
-    
+    livesDisplay.innerHTML = lives;
     document.removeEventListener('keydown', handleKeyDown);
     document.addEventListener('keydown', handleKeyDown);
     
@@ -161,8 +162,7 @@ function checkCollision(pacman, ghosts) {
 
 function gameLoop(pacman, ghosts) {
     collision = false;
-    livesDisplay.innerHTML = lives;
-    level.innerHTML = winTime+1;
+   
 
     gameBoard.moveCharacter(pacman);
     // checkCollision(pacman, ghosts);
@@ -274,15 +274,14 @@ function startGame() {
         gameBoard.createGrid(LEVEL);
 
     } else if (winTime==1){
-        showStoryScreen( `<p>After facing countless ghostly minions, a mysterious message reveals Phantom's hidden strength. Prepare for the ultimate challenge ahead.</p>
-        `)
+        showStoryScreen( `<p>After facing countless ghostly minions, a mysterious message reveals Phantom's hidden strength. Prepare for the ultimate challenge ahead.</p>`)
         gameBoard.createGrid(LEVEL2);
 
     }else if (winTime==2){
-        showStoryScreen( `<p>In the final showdown, Pacman confronts Phantom in the maze’s darkest depths. With courage and newfound power, he defeats the darkness, restoring peace to Neon City!</p>
-        `)
+        showStoryScreen( `<p>In the final showdown, Pacman confronts Phantom in the maze’s darkest depths. With courage and newfound power, he defeats the darkness, restoring peace to Neon City!</p> `)
         gameBoard.createGrid(LEVEL3);
     }
+    level.innerHTML = winTime+1;
     pauseBtn.classList.add('show');
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
