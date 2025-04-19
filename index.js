@@ -269,17 +269,38 @@ function startGame() {
     startBtn.classList.add('hide');
     if (winTime==0){
         showStoryScreen(`<p>In the neon maze of Neon City, darkness has begun to creep in. Once a haven of delicious dots and peaceful passageways, the maze is now besieged by ghostly forces led by the sinister Phantom. Only one hero, Pacman, holds the key to restoring light and harmony.</p>
-         
     `)
         gameBoard.createGrid(LEVEL);
+        ghosts = [
+            new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
+            new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
+            new Ghost(3, 230, randomMovement, OBJECT_TYPE.INKY),
+            new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
+        ];
 
     } else if (winTime==1){
+        document.body.style.backgroundImage = "url('./bglevel2.jpg')";
+
         showStoryScreen( `<p>After facing countless ghostly minions, a mysterious message reveals Phantom's hidden strength. Prepare for the ultimate challenge ahead.</p>`)
         gameBoard.createGrid(LEVEL2);
+        ghosts = [
+            new Ghost(4, 188, randomMovement, OBJECT_TYPE.BLINKY),
+            new Ghost(3, 209, randomMovement, OBJECT_TYPE.PINKY),
+            new Ghost(2, 230, randomMovement, OBJECT_TYPE.INKY),
+            new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
+        ];
 
     }else if (winTime==2){
+        document.body.style.backgroundImage = "url('./bglevel3.jpg')";
+
         showStoryScreen( `<p>In the final showdown, Pacman confronts Phantom in the maze’s darkest depths. With courage and newfound power, he defeats the darkness, restoring peace to Neon City!</p> `)
         gameBoard.createGrid(LEVEL3);
+        ghosts = [
+            new Ghost(1, 188, randomMovement, OBJECT_TYPE.BLINKY),
+            new Ghost(1, 209, randomMovement, OBJECT_TYPE.PINKY),
+            new Ghost(1, 230, randomMovement, OBJECT_TYPE.INKY),
+            new Ghost(1, 251, randomMovement, OBJECT_TYPE.CLYDE)
+        ];
     }
     level.innerHTML = winTime+1;
     pauseBtn.classList.add('show');
@@ -287,12 +308,6 @@ function startGame() {
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
     document.addEventListener('keydown', handleKeyDown);
 
-    ghosts = [
-        new Ghost(5, 188, randomMovement, OBJECT_TYPE.BLINKY),
-        new Ghost(4, 209, randomMovement, OBJECT_TYPE.PINKY),
-        new Ghost(3, 230, randomMovement, OBJECT_TYPE.INKY),
-        new Ghost(2, 251, randomMovement, OBJECT_TYPE.CLYDE)
-    ];
 
     startClock();
     startGameLoop();
