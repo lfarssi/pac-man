@@ -301,6 +301,12 @@ function startGame() {
             new Ghost(1, 230, randomMovement, OBJECT_TYPE.INKY),
             new Ghost(1, 251, randomMovement, OBJECT_TYPE.CLYDE)
         ];
+    }else{
+        level.innerHTML = winTime+1;
+
+        isWinner=true
+        gameOver()
+        return
     }
     level.innerHTML = winTime+1;
     pauseBtn.classList.add('show');
