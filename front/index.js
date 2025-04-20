@@ -91,7 +91,104 @@ function gameOver() {
     }
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
-    location.href="/add-score"
+    DisplayForm(score,clock)
+}
+
+function DisplayForm(score, clock) {
+    const container = document.createElement('div');
+    container.id = 'score-form-container';
+
+    const formatTime = (milliseconds) => {
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    };
+
+    const formattedTime = formatTime(clock);
+
+    container.innerHTML = `
+        <form id="score-form">
+            <h3>Game Over - Submit Your Score</h3>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
+            <input type="hidden" name="score" value="${score}" />
+            <input type="hidden" name="time" value="${formattedTime}" />
+            <button type="submit">Submit</button>
+        </form>
+    `;
+
+    document.body.appendChild(container);
+
+    document.getElementById('score-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+
+        fetch('http://localhost:8080/addScore', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: username,
+                score: score,
+                time: formattedTime
+            })
+        })
+        then(response => response.text())
+        .then(() => {
+            container.remove();
+            showScoreboard();
+        })
+        .catch(error => {
+            console.error('Error submitting score:', error);
+            alert("Error submitting score.");
+        });
+    });
+}
+
+
+function showScoreboard(page = 1) {
+    const existing = document.getElementById('scoreboard-container');
+    if (existing) existing.remove(); // prevent multiple boards
+
+    fetch(`http://localhost:8080/boardScore?page=${page}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log("jjjjjj",data);
+            
+            const container = document.createElement('div');
+            container.id = 'scoreboard-container';
+            container.innerHTML = `
+                <h2>Scoreboard</h2>
+                <table border="1">
+                    <tr><th>Rank</th><th>Name</th><th>Score</th><th>Time</th></tr>
+                    ${data.scores.map(score => `
+                        <tr>
+                            <td>${ordinal(score.rank)}</td>
+                            <td>${score.name}</td>
+                            <td>${score.score}</td>
+                            <td>${score.time}</td>
+                        </tr>`).join('')}
+                </table>
+                <p>← Page ${data.page} / ${data.totalPages} →</p>
+                <button ${page === 1 ? "disabled" : ""} onclick="changePage(${page - 1})">Prev</button>
+                <button ${page >= data.totalPages ? "disabled" : ""} onclick="changePage(${page + 1})">Next</button>
+            `;
+            document.body.appendChild(container);
+        })
+        .catch(err => {
+            console.error("Error loading scores:", err);
+        });
+}
+
+function ordinal(n) {
+    if (n % 10 === 1 && n % 100 !== 11) return n + "st";
+    if (n % 10 === 2 && n % 100 !== 12) return n + "nd";
+    if (n % 10 === 3 && n % 100 !== 13) return n + "rd";
+    return n + "th";
+}
+
+function changePage(newPage) {
+    showScoreboard(newPage); // old board will be removed in showScoreboard
 }
 
 function getKilled() {

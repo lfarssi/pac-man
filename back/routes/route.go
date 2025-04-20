@@ -7,7 +7,7 @@ import (
 )
 
 func Routers() {
-	http.HandleFunc("/", handlers.HomeHandler)
+
 
 	http.HandleFunc("/addScore", handlers.AddScore)
 	http.HandleFunc("/boardScore", handlers.DisplayBoard)
