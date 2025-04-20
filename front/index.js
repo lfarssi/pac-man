@@ -91,6 +91,7 @@ function gameOver() {
     }
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
+    location.href="/add-score"
 }
 
 function getKilled() {
