@@ -165,10 +165,6 @@ function showScoreboard(page = 1) {
 
     isPaused = true;
     isGameOver = true;
-    let existingOverlay = document.getElementById('scoreboard-overlay');
-    if (existingOverlay) {
-        existingOverlay.remove();
-    }
     const existing = document.getElementById('scoreboard-container');
     if (existing) existing.remove(); // prevent multiple boards
 
@@ -566,13 +562,11 @@ function restartGame() {
 }
 document.addEventListener('keydown',(e)=>{
    console.log(e.keyCode);
-   if(e.keyCode==32 && !started && !isPaused){
+   if(e.keyCode==32 && !started && !isPaused && !isGameOver){
     startGame();
 }else if(e.keyCode==27){
 pauseGame();
 
-}else if(e.keyCode==82){
-    restartGame()
 }
 })
 
