@@ -218,3 +218,112 @@
       );
     }
   }
+
+
+
+
+
+
+
+
+
+
+
+
+/* Style for the scoreboard container */
+#scoreboard-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border: 2px solid black;
+  z-index: 1000;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Style for the close button */
+#scoreboard-container button[id='closeButton'] {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 5px 10px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Style for the scoreboard heading */
+#scoreboard-container h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+/* Style for the scoreboard table */
+#scoreboard-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Style for the table header row */
+#scoreboard-container table tr:first-child {
+  background-color: #f2f2f2;
+}
+
+/* Style for table headers */
+#scoreboard-container th {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+/* Style for table data cells */
+#scoreboard-container td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Style for alternating table rows */
+#scoreboard-container tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Style for pagination info */
+#scoreboard-container div:nth-of-type(1) {
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Style for pagination buttons container */
+#scoreboard-container div:nth-of-type(2) {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Style for pagination buttons */
+#scoreboard-container div:nth-of-type(2) button {
+  padding: 5px 15px;
+  cursor: pointer;
+}
+
+/* Style for the play again button container */
+#scoreboard-container div:last-of-type {
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Style for the play again button */
+#scoreboard-container div:last-of-type button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

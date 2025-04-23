@@ -13,7 +13,6 @@ func DisplayBoard(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 
-	// Handle preflight request
 	if r.Method == http.MethodOptions {
 		w.WriteHeader(http.StatusOK)
 		return
@@ -29,7 +28,6 @@ func DisplayBoard(w http.ResponseWriter, r *http.Request) {
 		page, _ = strconv.Atoi(pageStr)
 	}
 
-	// Read all scores
 	data, err := os.ReadFile("./back/scores.json")
 	if err != nil {
 		http.Error(w, "Could not read scores", http.StatusInternalServerError)
@@ -38,12 +36,10 @@ func DisplayBoard(w http.ResponseWriter, r *http.Request) {
 	var scores []ScoreEntry
 	_ = json.Unmarshal(data, &scores)
 
-	// Sort by Score DESC
 	sort.Slice(scores, func(i, j int) bool {
 		return scores[i].Score > scores[j].Score
 	})
 
-	// Add Rank
 	type RankedEntry struct {
 		Rank  int    `json:"rank"`
 		Name  string `json:"name"`
@@ -60,7 +56,6 @@ func DisplayBoard(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	// Pagination
 	const pageSize = 5
 	start := (page - 1) * pageSize
 	end := start + pageSize
@@ -72,7 +67,7 @@ func DisplayBoard(w http.ResponseWriter, r *http.Request) {
 	}
 	paged := ranked[start:end]
 
-	// Return JSON
+
 	json.NewEncoder(w).Encode(struct {
 		TotalScores int           `json:"totalScores"`
 		Page        int           `json:"page"`

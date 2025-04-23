@@ -158,14 +158,17 @@ window.changePage = function(newPage) {
 };
 showScoreboard()
 function showScoreboard(page = 1) {
-    // Set flag to indicate scoreboard is active
+   
     window.scoreboardActive = true;
     console.log( window.scoreboardActive);
     
-    // Ensure game doesn't restart while viewing scores
+
     isPaused = true;
     isGameOver = true;
-    
+    let existingOverlay = document.getElementById('scoreboard-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
     const existing = document.getElementById('scoreboard-container');
     if (existing) existing.remove(); // prevent multiple boards
 
@@ -174,47 +177,18 @@ function showScoreboard(page = 1) {
         .then(data => {
             console.log("Scoreboard data:", data);
             
-            // Create overlay to block any other interactions
             const overlay = document.createElement('div');
             overlay.id = 'scoreboard-overlay';
-            overlay.style.position = 'fixed';
-            overlay.style.top = '0';
-            overlay.style.left = '0';
-            overlay.style.width = '100%';
-            overlay.style.height = '100%';
-            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-            overlay.style.zIndex = '999';
+        
             document.body.appendChild(overlay);
             
             const container = document.createElement('div');
             container.id = 'scoreboard-container';
             
-            // Apply styles to make it more visible and persistent
-            container.style.position = 'fixed';
-            container.style.top = '50%';
-            container.style.left = '50%';
-            container.style.transform = 'translate(-50%, -50%)';
-            container.style.backgroundColor = 'white';
-            container.style.padding = '20px';
-            container.style.border = '2px solid black';
-            container.style.zIndex = '1000';
-            container.style.width = '80%';
-            container.style.maxWidth = '600px';
-            container.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-            
-            // Add close button with enhanced visibility
             const closeButton = document.createElement('button');
-            closeButton.textContent = 'Close Scoreboard';
-            closeButton.style.position = 'absolute';
-            closeButton.style.top = '10px';
-            closeButton.style.right = '10px';
-            closeButton.style.padding = '5px 10px';
-            closeButton.style.backgroundColor = '#f44336';
-            closeButton.style.color = 'white';
-            closeButton.style.border = 'none';
-            closeButton.style.borderRadius = '4px';
-            closeButton.style.cursor = 'pointer';
-            
+            closeButton.textContent = 'X Close Scoreboard';
+            closeButton.id="closeButton"
+   
             closeButton.addEventListener('click', function() {
                 window.scoreboardActive = false;
                 container.remove();
@@ -256,7 +230,7 @@ function showScoreboard(page = 1) {
             container.appendChild(content);
             document.body.appendChild(container);
             
-            // Add event listeners to buttons
+            
             document.getElementById('prev-page').addEventListener('click', function() {
                 if (page > 1) changePage(page - 1);
             });
@@ -272,7 +246,7 @@ function showScoreboard(page = 1) {
                     document.getElementById('scoreboard-overlay').remove();
                 }
                 
-                // Reset game
+              
                 winTime = 0;
                 score = 0;
                 lives = 3;
