@@ -91,7 +91,9 @@ function gameOver() {
     }
     startBtn.classList.remove('hide');
     pauseBtn.classList.remove('show');
-    DisplayForm(score,clock)
+    setTimeout(() => {
+        DisplayForm(score, clock);
+    }, 3000);
 }
 
 function DisplayForm(score, clock) {
@@ -114,14 +116,15 @@ function DisplayForm(score, clock) {
             <input type="text" id="username" name="username" required />
             <input type="hidden" name="score" value="${score}" />
             <input type="hidden" name="time" value="${formattedTime}" />
-            <button type="submit">Submit</button>
+           <button type="button" id="submit-score">Submit</button>
         </form>
     `;
 
     document.body.appendChild(container);
-
-    document.getElementById('score-form').addEventListener('submit', function (e) {
-        e.preventDefault();
+    const form = container.querySelector('#score-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        // document.getElementById('submit-score').click();
         const username = document.getElementById('username').value;
 
         fetch('http://localhost:8080/addScore', {
@@ -132,51 +135,158 @@ function DisplayForm(score, clock) {
                 score: score,
                 time: formattedTime
             })
-        })
-        then(response => response.text())
+        })  
+        .then(response => response.text())
         .then(() => {
             container.remove();
-            showScoreboard();
+          
         })
         .catch(error => {
             console.error('Error submitting score:', error);
             alert("Error submitting score.");
         });
     });
+    document.getElementById('submit-score').addEventListener('click', function () {
+        form.dispatchEvent(new Event('submit'));
+   });
 }
 
+window.scoreboardActive = false;
 
+window.changePage = function(newPage) {
+    showScoreboard(newPage);
+};
+showScoreboard()
 function showScoreboard(page = 1) {
+    // Set flag to indicate scoreboard is active
+    window.scoreboardActive = true;
+    console.log( window.scoreboardActive);
+    
+    // Ensure game doesn't restart while viewing scores
+    isPaused = true;
+    isGameOver = true;
+    
     const existing = document.getElementById('scoreboard-container');
     if (existing) existing.remove(); // prevent multiple boards
 
     fetch(`http://localhost:8080/boardScore?page=${page}`)
         .then(res => res.json())
         .then(data => {
-            console.log("jjjjjj",data);
+            console.log("Scoreboard data:", data);
+            
+            // Create overlay to block any other interactions
+            const overlay = document.createElement('div');
+            overlay.id = 'scoreboard-overlay';
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '999';
+            document.body.appendChild(overlay);
             
             const container = document.createElement('div');
             container.id = 'scoreboard-container';
-            container.innerHTML = `
-                <h2>Scoreboard</h2>
-                <table border="1">
-                    <tr><th>Rank</th><th>Name</th><th>Score</th><th>Time</th></tr>
-                    ${data.scores.map(score => `
-                        <tr>
-                            <td>${ordinal(score.rank)}</td>
-                            <td>${score.name}</td>
-                            <td>${score.score}</td>
-                            <td>${score.time}</td>
+            
+            // Apply styles to make it more visible and persistent
+            container.style.position = 'fixed';
+            container.style.top = '50%';
+            container.style.left = '50%';
+            container.style.transform = 'translate(-50%, -50%)';
+            container.style.backgroundColor = 'white';
+            container.style.padding = '20px';
+            container.style.border = '2px solid black';
+            container.style.zIndex = '1000';
+            container.style.width = '80%';
+            container.style.maxWidth = '600px';
+            container.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+            
+            // Add close button with enhanced visibility
+            const closeButton = document.createElement('button');
+            closeButton.textContent = 'Close Scoreboard';
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '10px';
+            closeButton.style.right = '10px';
+            closeButton.style.padding = '5px 10px';
+            closeButton.style.backgroundColor = '#f44336';
+            closeButton.style.color = 'white';
+            closeButton.style.border = 'none';
+            closeButton.style.borderRadius = '4px';
+            closeButton.style.cursor = 'pointer';
+            
+            closeButton.addEventListener('click', function() {
+                window.scoreboardActive = false;
+                container.remove();
+                document.getElementById('scoreboard-overlay').remove();
+                startBtn.classList.remove('hide');
+            });
+            
+            container.appendChild(closeButton);
+            
+            const content = document.createElement('div');
+            content.innerHTML = `
+                <h2 style="text-align: center; margin-top: 0;">Scoreboard</h2>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background-color: #f2f2f2;">
+                        <th style="padding: 10px; border: 1px solid #ddd;">Rank</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Name</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Score</th>
+                        <th style="padding: 10px; border: 1px solid #ddd;">Time</th>
+                    </tr>
+                    ${data.scores.map((score, idx) => `
+                        <tr ${idx % 2 === 0 ? 'style="background-color: #f9f9f9;"' : ''}>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${ordinal(score.rank)}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">${score.name}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: right;">${score.score}</td>
+                            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${score.time}</td>
                         </tr>`).join('')}
                 </table>
-                <p>← Page ${data.page} / ${data.totalPages} →</p>
-                <button ${page === 1 ? "disabled" : ""} onclick="changePage(${page - 1})">Prev</button>
-                <button ${page >= data.totalPages ? "disabled" : ""} onclick="changePage(${page + 1})">Next</button>
+                <div style="margin-top: 15px; text-align: center;">
+                    <span>Page ${data.page} of ${data.totalPages}</span>
+                </div>
+                <div style="display: flex; justify-content: center; gap: 10px; margin-top: 10px;">
+                    <button id="prev-page" ${page <= 1 ? "disabled" : ""} style="padding: 5px 15px; cursor: pointer;">Previous</button>
+                    <button id="next-page" ${page >= data.totalPages ? "disabled" : ""} style="padding: 5px 15px; cursor: pointer;">Next</button>
+                </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button id="play-again" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Play</button>
+                </div>
             `;
+            container.appendChild(content);
             document.body.appendChild(container);
+            
+            // Add event listeners to buttons
+            document.getElementById('prev-page').addEventListener('click', function() {
+                if (page > 1) changePage(page - 1);
+            });
+            
+            document.getElementById('next-page').addEventListener('click', function() {
+                if (page < data.totalPages) changePage(page + 1);
+            });
+            
+            document.getElementById('play-again').addEventListener('click', function() {
+                window.scoreboardActive = false;
+                container.remove();
+                if (document.getElementById('scoreboard-overlay')) {
+                    document.getElementById('scoreboard-overlay').remove();
+                }
+                
+                // Reset game
+                winTime = 0;
+                score = 0;
+                lives = 3;
+                isWinner = false;
+                isGameOver = false;
+                isPaused = false;
+                
+                startGame();
+            });
         })
         .catch(err => {
             console.error("Error loading scores:", err);
+            alert("Error loading scoreboard. Please try again.");
+            window.scoreboardActive = false;
         });
 }
 
@@ -185,10 +295,6 @@ function ordinal(n) {
     if (n % 10 === 2 && n % 100 !== 12) return n + "nd";
     if (n % 10 === 3 && n % 100 !== 13) return n + "rd";
     return n + "th";
-}
-
-function changePage(newPage) {
-    showScoreboard(newPage); // old board will be removed in showScoreboard
 }
 
 function getKilled() {
