@@ -41,7 +41,7 @@ func AddScore(w http.ResponseWriter, r *http.Request) {
 	}
 
 
-
+	scores = append(scores, entry)
 
 	data, err := json.MarshalIndent(scores, "", "  ")
 	if err != nil {

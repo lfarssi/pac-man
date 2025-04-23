@@ -68,12 +68,10 @@ func DisplayBoard(w http.ResponseWriter, r *http.Request) {
 	paged := ranked[start:end]
 
 	json.NewEncoder(w).Encode(struct {
-		TotalScores int           `json:"totalScores"`
 		Page        int           `json:"page"`
 		TotalPages  int           `json:"totalPages"`
 		Scores      []RankedEntry `json:"scores"`
 	}{
-		TotalScores: len(scores),
 		Page:        page,
 		TotalPages:  (len(scores) + pageSize - 1) / pageSize,
 		Scores:      paged,

@@ -99,7 +99,8 @@ function gameOver() {
 function DisplayForm(score, clock) {
     const container = document.createElement('div');
     container.id = 'score-form-container';
-
+    startBtn.classList.add('hide');
+    
     const formatTime = (milliseconds) => {
         const totalSeconds = Math.floor(milliseconds / 1000);
         const minutes = Math.floor(totalSeconds / 60);
@@ -124,9 +125,8 @@ function DisplayForm(score, clock) {
     const form = container.querySelector('#score-form');
     form.addEventListener('submit', function(event) {
         event.preventDefault();
-        // document.getElementById('submit-score').click();
         const username = document.getElementById('username').value;
-
+        startBtn.classList.remove('hide');
         fetch('http://localhost:8080/addScore', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
