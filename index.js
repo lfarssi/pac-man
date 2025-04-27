@@ -55,7 +55,7 @@ function handleKeyDown(e) {
     pacman.handleKeyInput(e, gameBoard.objectExists);
 }
 function handleTouchMove(e) {
-    alert(e)
+    alert(e.touches[0])
     const touchStart = e.touches[0];
     let touchEnd = null;
 
