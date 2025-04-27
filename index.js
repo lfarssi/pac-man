@@ -63,10 +63,10 @@ function handleTouchMove(e) {
         touchEnd = e.changedTouches[0];
         handleSwipeDirection(touchStart, touchEnd);
         // Remove the event listener after touch is done
-        gameGrid.removeEventListener('touchend', handleTouchEnd);
+        document.removeEventListener('touchend', handleTouchEnd);
     };
 
-    gameGrid.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener('touchend', handleTouchEnd);
 }
 
 function handleSwipeDirection(start, end) {
@@ -350,7 +350,7 @@ function startGame() {
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
     document.addEventListener('keydown', handleKeyDown);
-    gameGrid.addEventListener('touchstart', handleTouchMove);
+    document.addEventListener('touchstart', handleTouchMove);
 
 
     startClock();
