@@ -54,6 +54,43 @@ function playAudio(audio) {
 function handleKeyDown(e) {
     pacman.handleKeyInput(e, gameBoard.objectExists);
 }
+function handleTouchMove(e) {
+    const touchStart = e.touches[0];
+    let touchEnd = null;
+
+    // Set up event listener for the end of the touch
+    const handleTouchEnd = (e) => {
+        touchEnd = e.changedTouches[0];
+        handleSwipeDirection(touchStart, touchEnd);
+        // Remove the event listener after touch is done
+        gameGrid.removeEventListener('touchend', handleTouchEnd);
+    };
+
+    gameGrid.addEventListener('touchend', handleTouchEnd);
+}
+
+function handleSwipeDirection(start, end) {
+    const dx = end.pageX - start.pageX;
+    const dy = end.pageY - start.pageY;
+
+    if (Math.abs(dx) > Math.abs(dy)) {
+        // Horizontal swipe (left or right)
+        if (dx > 0) {
+            pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowRight.code }, gameBoard.objectExists);
+        } else {
+            pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowLeft.code }, gameBoard.objectExists);
+        }
+    } else {
+        // Vertical swipe (up or down)
+        if (dy > 0) {
+            pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowDown.code }, gameBoard.objectExists);
+        } else {
+            pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowUp.code }, gameBoard.objectExists);
+        }
+    }
+}
+
+
 
 function showStoryScreen(message) {
     const screen= document.querySelector('#story-container')
@@ -313,6 +350,7 @@ function startGame() {
     pacman = new Pacman(2, 287);
     gameBoard.addObject(287, [OBJECT_TYPE.PACMAN]);
     document.addEventListener('keydown', handleKeyDown);
+    gameGrid.addEventListener('touchstart', handleTouchMove);
 
 
     startClock();
