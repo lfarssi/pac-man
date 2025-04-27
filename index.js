@@ -55,18 +55,27 @@ function handleKeyDown(e) {
     pacman.handleKeyInput(e, gameBoard.objectExists);
 }
 function handleTouchMove(e) {
-    alert(e.touches[0])
+    // Get the starting touch position
     const touchStart = e.touches[0];
     let touchEnd = null;
 
-    // Set up event listener for the end of the touch
+    // Set up event listener for the end of the touch (touchend event)
     const handleTouchEnd = (e) => {
+        // Get the final touch position
         touchEnd = e.changedTouches[0];
+
+        // Log positions for debugging (optional)
+        console.log(`Start: (${touchStart.pageX}, ${touchStart.pageY})`);
+        console.log(`End: (${touchEnd.pageX}, ${touchEnd.pageY})`);
+
+        // Call the function to handle the swipe direction
         handleSwipeDirection(touchStart, touchEnd);
-        // Remove the event listener after touch is done
+
+        // Remove the event listener after the touch ends
         document.removeEventListener('touchend', handleTouchEnd);
     };
 
+    // Add the touchend event listener
     document.addEventListener('touchend', handleTouchEnd);
 }
 
@@ -74,22 +83,30 @@ function handleSwipeDirection(start, end) {
     const dx = end.pageX - start.pageX;
     const dy = end.pageY - start.pageY;
 
+    // Check horizontal swipe (left or right)
     if (Math.abs(dx) > Math.abs(dy)) {
-        // Horizontal swipe (left or right)
         if (dx > 0) {
+            console.log("Swipe Right");
             pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowRight.code }, gameBoard.objectExists);
         } else {
+            console.log("Swipe Left");
             pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowLeft.code }, gameBoard.objectExists);
         }
-    } else {
-        // Vertical swipe (up or down)
+    }
+    // Check vertical swipe (up or down)
+    else {
         if (dy > 0) {
+            console.log("Swipe Down");
             pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowDown.code }, gameBoard.objectExists);
         } else {
+            console.log("Swipe Up");
             pacman.handleKeyInput({ keyCode: DIRECTIONS.ArrowUp.code }, gameBoard.objectExists);
         }
     }
 }
+
+// Add touchstart listener for mobile users
+document.addEventListener('touchstart', handleTouchMove);
 
 
 
